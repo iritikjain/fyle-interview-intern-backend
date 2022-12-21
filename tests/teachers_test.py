@@ -100,3 +100,30 @@ def test_grade_assignment_draft_assignment(client, h_teacher_1):
     data = response.json
 
     assert data['error'] == 'FyleError'
+
+def test_grade_assignment_by_teacher_with_id_1(client, h_teacher_1):
+    """ Added test for grading api """
+    response = client.post(
+        '/teacher/assignments/grade',
+        headers=h_teacher_1
+        , json={
+            "id": 1,
+            "grade": "A"
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json['data']
+    assert data['grade'] == "A"
+    assert data['state'] == 'GRADED'
+
+def test_get_assignments_unauthorized_teacher(client):
+    """ invalid test case: assignments submitted can only be accessed by authorised teachers """
+    response = client.get(
+        '/teacher/assignments',
+        headers=""
+    )
+
+    assert response.status_code == 401
+    data = response.json
+    assert data['error'] == 'FyleError'
